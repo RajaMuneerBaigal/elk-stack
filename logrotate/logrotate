@@ -1,0 +1,12 @@
+/tmp/logs/hello.log {
+    weekly
+    missingok
+    su root adm
+    create 700 raju raju
+    rotate 4
+    compress
+    copytruncate
+    minsize 100k
+}
+
+

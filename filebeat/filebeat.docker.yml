@@ -1,0 +1,66 @@
+filebeat.config:
+  modules:
+    path: ${path.config}/modules.d/*.yml
+    reload.enabled: false
+#filebeat.inputs:
+ # - type: filestream
+  #  id: my-filestream-id
+   # paths:
+    #  - ./hello.log
+
+#======================================
+
+filebeat.inputs:
+- type: filestream
+
+  # Unique ID among all inputs, an ID is required.
+  id: my-filestream-id
+
+  # Change to true to enable this input configuration.
+  enabled: true
+
+  # Paths that should be crawled and fetched. Glob based paths.
+  paths:
+    - ./hello.log
+    #- c:\programdata\elasticsearch\logs\*
+  processors:
+    - dissect:
+        tokenizer: "%{date} %{time} %{tag_name} %{tag_machine_name} %{site_id} %{parking_lot_id} %{log_level} %{message}"
+        field: "message"
+        target_prefix: "dissect"
+
+
+#======================================
+
+processors:
+- add_cloud_metadata: ~
+
+#======================================
+
+#setup.dashboards.enabled: true
+
+#============================
+
+#setup.kibana:
+ # host: "https://192.168.1.45:5601"
+ # username: "elastic"
+ # password: "elastic"
+ # ssl.verification_mode: certificate
+ # ssl.certificate_authorities: /usr/share/filebeat/config/certs/ca/ca.crt
+
+
+#======================================
+
+#output.elasticsearch:
+  #hosts: ["192.168.1.38:9200"]
+  #username: "elastic"
+  #password: "elastic"
+  #ssl.certificate_authorities: ["./http_ca.crt"]
+
+#======================================
+
+output.logstash:
+  hosts: ["192.168.1.9:5044"]
+  ssl.certificate_authorities: ["/usr/share/filebeat/config/certs/ca/ca.crt"]
+  ssl.certificate: "/usr/share/filebeat/config/certs/logstash/logstash.crt"
+  ssl.key: "/usr/share/filebeat/config/certs/logstash/logstash.pkcs8.key"

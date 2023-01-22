@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+
+########################## Filebeat Section ##########################################
+
+    filebeat:
+        container_name: filebeat
+        image: docker.elastic.co/beats/filebeat:8.6.0
+        user: root
+        volumes:
+            -  "./filebeat/filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro"
+            -  "./hello.log:/usr/share/filebeat/hello.log:ro"
+            -  "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+            -  "/var/run/docker.sock:/var/run/docker.sock:ro"
+            -  "./certs:/usr/share/filebeat/config/certs"
+        command: filebeat -e --strict.perms=false
+
+########################## Heartbeat Section ##########################################
+
+    heartbeat:
+        container_name: heartbeat
+        image: docker.elastic.co/beats/heartbeat:8.6.0
+        user: root
+        volumes:
+            -  "./heartbeat/heartbeat.docker.yml:/usr/share/heartbeat/heartbeat.yml:ro"
+            -  "/var/lib/docker/containers:/var/lib/docker/containers:ro"
+            -  "/var/run/docker.sock:/var/run/docker.sock:ro"
+            -  "./certs:/usr/share/heartbeat/config/certs"
+        command: --strict.perms=false -e
+
+########################## Metricbeat Section ##########################################
+
+
+    metricbeat:
+        container_name: metricbeat
+        image: docker.elastic.co/beats/metricbeat:8.6.0
+        user: root
+        volumes:
+            - "./metricbeat/metricbeat.docker.yml:/usr/share/metricbeat/metricbeat.yml:ro"
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+            - "/sys/fs/cgroup:/hostfs/sys/fs/cgroup:ro"
+            - "/proc:/hostfs/proc:ro"
+            -  ./certs:/usr/share/metricbeat/config/certs
+        command: metricbeat -e --strict.perms=false
+
+########################## Packetbeat Section #################################>
+
+    packetbeat:
+        container_name: packetbeat
+        image: docker.elastic.co/beats/packetbeat:8.6.0
+        cap_add:
+         - NET_ADMIN
+        user: root
+        network_mode: "host"
+        volumes:
+            - "./packetbeat/packetbeat.docker.yml:/usr/share/packetbeat/packetbeat.yml:ro"
+            - ./certs:/usr/share/packetbeat/config/certs
+        command: packetbeat -e --strict.perms=false
+
+

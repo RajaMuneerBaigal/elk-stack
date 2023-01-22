@@ -1,0 +1,52 @@
+heartbeat.monitors:
+- type: http
+  schedule: '@every 5s'
+  urls:
+    #- http://192.168.1.38:9200
+    #- http://192.168.1.38:5601
+    - https://192.168.1.9:9200
+    - https://192.168.1.9:5601
+
+#============================
+- type: icmp
+  schedule: '@every 5s'
+  hosts:
+    - elasticsearch
+    - kibana
+
+#============================
+
+#============================
+
+processors:
+- add_cloud_metadata: ~
+
+
+#============================
+
+setup.dashboards.enabled: true
+
+setup.dashboards.always_kibana: true
+#============================
+
+setup.kibana:
+  host: "https://192.168.1.38:5601"
+  username: "elastic"
+  password: "elastic"
+  ssl.verification_mode: certificate
+  ssl.certificate_authorities: /usr/share/heartbeat/config/certs/ca/ca.crt
+
+
+#============================
+
+#output.elasticsearch:
+  #hosts: '${ELASTICSEARCH_HOSTS:https://192.168.1.38:9200}'
+  #username: '${ELASTICSEARCH_USERNAME:elastic}'
+  #password: '${ELASTICSEARCH_PASSWORD:elastic}'
+
+#============================
+output.logstash:
+  hosts: ["192.168.1.38:5044"]
+  ssl.certificate_authorities: ["/usr/share/heartbeat/config/certs/ca/ca.crt"]
+  ssl.certificate: "/usr/share/heartbeat/config/certs/logstash/logstash.crt"
+  ssl.key: "/usr/share/heartbeat/config/certs/logstash/logstash.pkcs8.key"
